@@ -32,4 +32,9 @@ urlpatterns = [
     url(r'^get_address_info_by_id/',views.get_address_info_by_id),
     url(r'^get_all_address_info/',views.get_all_address_info),
     url(r'^modify_address/',views.modify_address),
+    url(r'^create_news/',views.create_news),
+    url(r'^remove_news/',views.remove_news),
+    url(r'^get_news_list/',views.get_news_list),
+    url(r'^get_news_detail_by_id/',views.get_news_detail_by_id),
+    url(r'^modify_news/',views.modify_news),
 ]

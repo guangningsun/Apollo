@@ -3,7 +3,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 import json,time
-from TestModel.models import UserInfo,AddressInfo
+from TestModel.models import UserInfo,AddressInfo,NewsInfo
 
 # 内部方法，用于获取当前时间戳
 def _get_timestamp():
@@ -194,15 +194,86 @@ def modify_address(request):
     except:
         return _generate_json_message(False, "update address info false")
 
+# 创建新闻
+# success
+def create_news(request):
+    try:
+        if request.POST:
+            news_info = NewsInfo(news_id=_get_timestamp(),
+                                 news_title=request.POST['news_title'],
+                                 news_date=request.POST['news_date'],
+                                 news_author=request.POST['news_author'],
+                                 news_details=request.POST['news_details']
+                                 )
+            news_info.save()
+        return _generate_json_message(True, "create news success")
+    except:
+        return _generate_json_message(False, "create news false")
 
+
+# 删除新闻
+# success
+def remove_news(request):
+    try:
+        news_ids = request.POST['news_ids']
+        for news_id in news_ids.split(","):
+            news_info = NewsInfo.objects.get(news_id=news_id)
+            news_info.delete()
+        return _generate_json_message(True, "remove news success")
+    except:
+        return _generate_json_message(False, "remove news false")
+
+
+# 获取新闻列表
+# success
+def get_news_list(request):
+    list_response = []
+    list_news = NewsInfo.objects.all()
+    for res in list_news:
+        dict_tmp = {}
+        dict_tmp.update(res.__dict__)
+        dict_tmp.pop("_state", None)
+        list_response.append(dict_tmp)
+    return _generate_json_from_models(list_response)
+
+
+# 通过ID过去新闻详细信息
+# success
+def get_news_detail_by_id(request):
+    try:
+        news_id = request.POST['news_id']
+        if news_id:
+            list_response = []
+            list_news = NewsInfo.objects.filter(news_id=news_id)
+            for res in list_news:
+                dict_tmp = {}
+                dict_tmp.update(res.__dict__)
+                dict_tmp.pop("_state", None)
+                list_response.append(dict_tmp)
+        return _generate_json_from_models(list_response)
+    except:
+        return _generate_json_message(False, "can`t get news info by this id")
+
+
+# 修改新闻
+# success
+def modify_news(request):
+    try:
+        if request.POST:
+            news_info = NewsInfo.objects.get(news_id=request.POST['news_id'])
+            news_info.news_title = request.POST['news_title']
+            news_info.news_author = request.POST['news_author']
+            news_info.news_details = request.POST['news_details']
+            news_info.news_date = request.POST['news_date']
+            news_info.save()
+        return _generate_json_message(True,"update news info success")
+    except:
+        return _generate_json_message(False, "update news info false")
+
+# 爬虫爬取人民日报最新20条文章
 
 # 初始化登录界面
 def init_web(request):
     return render(request, 'signin.html')
 
-
-# 登录跳转界面
-def login(request):
-    context = {  }
-    return render(request, 'table.html', context)
 

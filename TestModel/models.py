@@ -17,4 +17,11 @@ class AddressInfo(models.Model):
     address_city = models.CharField(max_length=200)
     address_street = models.CharField(max_length=200)
 
+# 新闻类
+class NewsInfo(models.Model):
+    news_id = models.CharField(max_length=200)
+    news_title = models.CharField(max_length=200)
+    news_date = models.CharField(max_length=200)
+    news_author = models.CharField(max_length=200)
+    news_details = models.CharField(max_length=5000)
 
