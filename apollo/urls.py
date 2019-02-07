@@ -27,4 +27,9 @@ urlpatterns = [
     url(r'^get_user_info_by_id/',views.get_user_info_by_id),
     url(r'^modify_user/',views.modify_user),
     url(r'^remove_user/',views.remove_user),
+    url(r'^create_address/',views.create_address),
+    url(r'^remove_address/',views.remove_address),
+    url(r'^get_address_info_by_id/',views.get_address_info_by_id),
+    url(r'^get_all_address_info/',views.get_all_address_info),
+    url(r'^modify_address/',views.modify_address),
 ]

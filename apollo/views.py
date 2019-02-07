@@ -121,21 +121,78 @@ def user_login(request):
 
 
 # 街道信息增加
+# success
 def create_address(request):
-    pass
+    try:
+        if request.POST:
+            address_info = AddressInfo(address_id=request.POST['address_id'],
+                                    address_province=request.POST['address_province'],
+                                    address_city=request.POST['address_city'],
+                                    address_street=request.POST['address_street']
+                                 )
+            address_info.save()
+        return _generate_json_message(True, "create address success")
+    except:
+        return _generate_json_message(False, "create address false")
+
+
 # 街道信息删除
+# success
 def remove_address(request):
-    pass
+    try:
+        address_ids = request.POST['address_ids']
+        for address_id in address_ids.split(","):
+            address_info = AddressInfo.objects.get(address_id=address_id)
+            address_info.delete()
+        return _generate_json_message(True, "remove address success")
+    except:
+        return _generate_json_message(False, "remove address false")
+
+
 # 街道信息查找
+# success
 def get_address_info_by_id(request):
-    pass
+    try:
+        address_id = request.POST['address_id']
+        if address_id:
+            list_response = []
+            list_address = AddressInfo.objects.filter(address_id=address_id)
+            for res in list_address:
+                dict_tmp = {}
+                dict_tmp.update(res.__dict__)
+                dict_tmp.pop("_state", None)
+                list_response.append(dict_tmp)
+        return _generate_json_from_models(list_response)
+    except:
+        return _generate_json_message(False, "can`t get address info by this id")
+
 
 # 获取所有街道信息
+# success
 def get_all_address_info(request):
-    pass
+    list_response = []
+    list_address = AddressInfo.objects.all()
+    for res in list_address:
+        dict_tmp = {}
+        dict_tmp.update(res.__dict__)
+        dict_tmp.pop("_state", None)
+        list_response.append(dict_tmp)
+    return _generate_json_from_models(list_response)
+
+
 # 街道信息修改
+# success
 def modify_address(request):
-    pass
+    try:
+        if request.POST:
+            address_info = AddressInfo.objects.get(address_id=request.POST['address_id'])
+            address_info.address_province = request.POST['address_province']
+            address_info.address_city = request.POST['address_city']
+            address_info.address_street = request.POST['address_street']
+            address_info.save()
+        return _generate_json_message(True,"update address info success")
+    except:
+        return _generate_json_message(False, "update address info false")
 
 
 
@@ -149,27 +206,3 @@ def login(request):
     context = {  }
     return render(request, 'table.html', context)
 
-# 获取资产管理界面
-def reload_dev_web(request):
-    context = {}
-    return render(request, 'table.html', context)
-
-
-def delete_dev(request):
-
-    dev_ids = request.GET['dev_ids']
-    for dev_id in dev_ids.split(","):
-        dev1 = DeviceInfo.objects.get(id=dev_id)
-        dev1.delete()
-    return HttpResponseRedirect("/reload_dev_web")
-
-
-def get_all_data(request):
-    list_response = []
-    list_dev = DeviceInfo.objects.all()
-    for res in list_dev:
-        dict_tmp = {}
-        dict_tmp.update(res.__dict__)
-        dict_tmp.pop("_state", None)
-        list_response.append(dict_tmp)
-    return HttpResponse(json.dumps(list_response), content_type="application/json")
