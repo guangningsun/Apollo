@@ -38,7 +38,7 @@ def collect_news(request):
 
 
 # 用户删除收藏新闻
-# success 
+# success
 def remove_collected_news(request):
     try:
         user_news_mapping_ids = request.POST['user_news_mapping_ids']
