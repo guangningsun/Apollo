@@ -2,21 +2,140 @@
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-import json
-from TestModel.models import DeviceInfo
+import json,time
+from TestModel.models import UserInfo,AddressInfo
+
+# 内部方法，用于获取当前时间戳
+def _get_timestamp():
+    return int(time.time())
+
+
+# 内部方法用于返回json消息
+def _generate_json_message(flag, message):
+    if flag:
+        return HttpResponse("{\"error\":0,\"errmsg\":"+message+"}",content_type="application/json")
+    else:
+        return HttpResponse("{\"error\":1,\"errmsg\":"+message+"}",content_type="application/json")
+
+
+# 内部方法用于将对象返回值转换成json串
+def _generate_json_from_models(response_list):
+    return HttpResponse(json.dumps(response_list), content_type="application/json")
 
 # 创建用户信息/用户注册
+# success
+def create_user(request):
+    try:
+        if request.POST:
+            user_info = UserInfo(username=request.POST['username'],
+                                 password=request.POST['password'],
+                                 user_id=_get_timestamp(),
+                                 user_email=request.POST['user_email'],
+                                 user_address=request.POST['user_address'],
+                                 user_phone=request.POST['user_phone']
+                                 )
+            user_info.save()
+        return _generate_json_message(True, "create user success")
+    except:
+        return _generate_json_message(False, "create user false")
+
+
 # 删除用户信息
+# success
+def remove_user(request):
+    try:
+        user_ids = request.POST['user_ids']
+        for user_id in user_ids.split(","):
+            user_info = UserInfo.objects.get(user_id=user_id)
+            user_info.delete()
+        return _generate_json_message(True, "remove user success")
+    except:
+        return _generate_json_message(False, "remove user false")
+
+
 # 修改用户信息
+# success
+def modify_user(request):
+    try:
+        if request.POST:
+            user_info = UserInfo.objects.get(user_id=request.POST['user_id'])
+            user_info.username = request.POST['username']
+            user_info.password = request.POST['password']
+            user_info.user_email= request.POST['user_email']
+            user_info.user_address = request.POST['user_address']
+            user_info.user_phone = request.POST['user_phone']
+            user_info.save()
+        return _generate_json_message(True,"update user info success")
+    except:
+        return _generate_json_message(False, "update user info false")
+
+
 # 查找用户信息
+# success
+def get_user_info_by_id(request):
+    try:
+        user_id = request.POST['user_id']
+        if user_id:
+            list_response = []
+            list_user = UserInfo.objects.filter(user_id=user_id)
+            for res in list_user:
+                dict_tmp = {}
+                dict_tmp.update(res.__dict__)
+                dict_tmp.pop("_state", None)
+                list_response.append(dict_tmp)
+        return _generate_json_from_models(list_response)
+    except:
+        return _generate_json_message(False, "can`t get user info by this id")
+
+
+
 # 获取所有用户信息
+# success
+def get_all_user_info(request):
+    list_response = []
+    list_user = UserInfo.objects.all()
+    for res in list_user:
+        dict_tmp = {}
+        dict_tmp.update(res.__dict__)
+        dict_tmp.pop("_state", None)
+        list_response.append(dict_tmp)
+    return _generate_json_from_models(list_response)
+
+
 # 用户登录
+# success
+def user_login(request):
+    if request.POST:
+        login_username = request.POST['username']
+        login_password = request.POST['password']
+        try:
+            if login_username:
+                user_info = UserInfo.objects.get(username=login_username)
+            if user_info is not None:
+                if user_info.password == login_password:
+                    return _generate_json_message(True, "login success")
+                else:
+                    return _generate_json_message(False, "login false")
+        except:
+            return _generate_json_message(False, "login false")
+
 
 # 街道信息增加
+def create_address(request):
+    pass
 # 街道信息删除
+def remove_address(request):
+    pass
 # 街道信息查找
-# 街道信息修改
+def get_address_info_by_id(request):
+    pass
 
+# 获取所有街道信息
+def get_all_address_info(request):
+    pass
+# 街道信息修改
+def modify_address(request):
+    pass
 
 
 
@@ -34,33 +153,6 @@ def login(request):
 def reload_dev_web(request):
     context = {}
     return render(request, 'table.html', context)
-
-
-# 获取下载文件页面
-def dev_manager(request):
-    context = {}
-    return render(request, 'table.html', context)
-
-
-def file_list(request):
-    context = {}
-    return render(request, 'list.html', context)
-
-
-def create_dev(request):
-    if request.POST:
-        dev1 = DeviceInfo(sname=request.POST['sname'],
-                          dev_source=request.POST['dev_source'],
-                          dev_model=request.POST['dev_model'],
-                          dev_role=request.POST['dev_role'],
-                          dev_user=request.POST['dev_user'],
-                          approver=request.POST['approver'],
-                          dev_desc=request.POST['dev_desc'],
-                          dev_status=request.POST['dev_status'],
-                          borrow_time_limit=request.POST['borrow_time_limit']
-                          )
-        dev1.save()
-    return HttpResponseRedirect("/reload_dev_web")
 
 
 def delete_dev(request):
