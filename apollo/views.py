@@ -3,7 +3,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 import json,time
-from TestModel.models import UserInfo,AddressInfo,NewsInfo
+from TestModel.models import UserInfo,AddressInfo,NewsInfo,UserNewsMapping
 
 # 内部方法，用于获取当前时间戳
 def _get_timestamp():
@@ -21,6 +21,64 @@ def _generate_json_message(flag, message):
 # 内部方法用于将对象返回值转换成json串
 def _generate_json_from_models(response_list):
     return HttpResponse(json.dumps(response_list), content_type="application/json")
+
+# 用户收藏新闻
+# success
+def collect_news(request):
+    try:
+        if request.POST:
+            user_news_mapping = UserNewsMapping(user_news_mapping_id=_get_timestamp(),
+                                 user_id=request.POST['user_id'],
+                                 news_id=request.POST['news_id']
+                                 )
+            user_news_mapping.save()
+        return _generate_json_message(True, "collect news success")
+    except:
+        return _generate_json_message(False, "collect news false")
+
+
+# 用户删除收藏新闻
+# success 
+def remove_collected_news(request):
+    try:
+        user_news_mapping_ids = request.POST['user_news_mapping_ids']
+        for user_news_mapping_id in user_news_mapping_ids.split(","):
+            user_news_mapping = UserNewsMapping.objects.get(user_news_mapping_id=user_news_mapping_id)
+            user_news_mapping.delete()
+        return _generate_json_message(True, "remove collected news success")
+    except:
+        return _generate_json_message(False, "remove collected news false")
+
+# 获取所有用户的所有收藏新闻列表
+# success
+def get_all_collection_list(request):
+    list_response = []
+    list_user_news_mapping = UserNewsMapping.objects.all()
+    for res in list_user_news_mapping:
+        dict_tmp = {}
+        dict_tmp.update(res.__dict__)
+        dict_tmp.pop("_state", None)
+        list_response.append(dict_tmp)
+    return _generate_json_from_models(list_response)
+
+
+# 获取某个用户的收藏新闻列表
+# success
+def get_collection_list_by_user_id(request):
+    try:
+        user_id = request.POST['user_id']
+        if user_id:
+            list_response = []
+            list_user_news_mapping = UserNewsMapping.objects.filter(user_id=user_id)
+            for res in list_user_news_mapping:
+                dict_tmp = {}
+                dict_tmp.update(res.__dict__)
+                dict_tmp.pop("_state", None)
+                list_response.append(dict_tmp)
+        return _generate_json_from_models(list_response)
+    except:
+        return _generate_json_message(False, "can`t get user collected news by this id")
+
 
 # 创建用户信息/用户注册
 # success

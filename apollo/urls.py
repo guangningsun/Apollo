@@ -37,4 +37,8 @@ urlpatterns = [
     url(r'^get_news_list/',views.get_news_list),
     url(r'^get_news_detail_by_id/',views.get_news_detail_by_id),
     url(r'^modify_news/',views.modify_news),
+    url(r'^collect_news/',views.collect_news),
+    url(r'^remove_collected_news/',views.remove_collected_news),
+    url(r'^get_all_collection_list/',views.get_all_collection_list),
+    url(r'^get_collection_list_by_user_id/',views.get_collection_list_by_user_id),
 ]

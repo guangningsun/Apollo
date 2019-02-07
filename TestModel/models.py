@@ -25,3 +25,9 @@ class NewsInfo(models.Model):
     news_author = models.CharField(max_length=200)
     news_details = models.CharField(max_length=5000)
 
+# 用户收藏新闻映射
+class UserNewsMapping(models.Model):
+    user_news_mapping_id = models.CharField(max_length=200)
+    user_id = models.CharField(max_length=200)
+    news_id = models.CharField(max_length=2000)
+
