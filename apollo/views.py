@@ -178,6 +178,24 @@ def user_login(request):
             return _generate_json_message(False, "login false")
 
 
+# web用户登录
+# success
+def user_login_web(request):
+    context = {}
+    if request.POST:
+        login_username = request.POST['username']
+        login_password = request.POST['password']
+        try:
+            if login_username:
+                user_info = UserInfo.objects.get(username=login_username)
+            if user_info is not None:
+                if user_info.password == login_password:
+                    return render(request, 'manager.html', context)
+                else:
+                    return render(request, 'signin.html')
+        except:
+            return render(request, 'signin.html')
+
 # 街道信息增加
 # success
 def create_address(request):
@@ -333,5 +351,6 @@ def modify_news(request):
 # 初始化登录界面
 def init_web(request):
     return render(request, 'signin.html')
+
 
 

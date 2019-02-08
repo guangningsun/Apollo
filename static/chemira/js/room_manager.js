@@ -156,64 +156,43 @@ $(document).ready(function() {
         checkbox: true
     });
     columns.push({
-        field: 'sname',
-        title: '序列号',
+        field: 'user_id',
+        title: '用户ID',
         align: 'center',
         valign: 'middle',
         sortable: true
     });
     columns.push({
-        field: 'dev_model',
-        title: '型号',
+        field: 'username',
+        title: '用户名',
         align: 'center',
         valign: 'middle',
         sortable: true
     });
     columns.push({
-        field: 'dev_source',
-        title: '来源',
+        field: 'password',
+        title: '密码',
         align: 'center',
         valign: 'middle',
         sortable: true
     });
     columns.push({
-        field: 'dev_role',
-        title: '角色',
+        field: 'user_email',
+        title: '邮箱',
         align: 'center',
         valign: 'middle',
         sortable: true
     });
     columns.push({
-        field: 'dev_user',
-        title: '使用人',
+        field: 'user_address',
+        title: '所属片区',
         align: 'center',
         valign: 'middle',
         sortable: true
     });
     columns.push({
-        field: 'approver',
-        title: '审批人',
-        align: 'center',
-        valign: 'middle',
-        sortable: true
-    });
-    columns.push({
-        field: 'dev_status',
-        title: '状态',
-        align: 'center',
-        valign: 'middle',
-        sortable: true
-    });
-    columns.push({
-        field: 'borrow_time_limit',
-        title: '期限',
-        align: 'center',
-        valign: 'middle',
-        sortable: true
-    });
-    columns.push({
-        field: 'dev_desc',
-        title: '描述',
+        field: 'user_phone',
+        title: '联系电话',
         align: 'center',
         valign: 'middle',
         sortable: true
@@ -236,7 +215,7 @@ $(document).ready(function() {
 
     $.ajax({
         type: "GET",
-        url: 'get_all_data',
+        url: '/get_all_user_info',
         success: function(data) {
             console.log(data);
             var allRoomDataObjs = eval(data);
