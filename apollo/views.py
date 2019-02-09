@@ -98,11 +98,42 @@ def create_user(request):
         return _generate_json_message(False, "create user false")
 
 
+# 创建用户信息/用户注册
+# success
+def create_user_web(request):
+    try:
+        if request.POST:
+            user_info = UserInfo(username=request.POST['username'],
+                                 password=request.POST['password'],
+                                 user_id=_get_timestamp(),
+                                 user_email=request.POST['user_email'],
+                                 user_address=request.POST['user_address'],
+                                 user_phone=request.POST['user_phone']
+                                 )
+            user_info.save()
+        return render(request,"manager.html")
+    except:
+        return _generate_json_message(False, "create user false")
+
 # 删除用户信息
 # success
 def remove_user(request):
     try:
         user_ids = request.POST['user_ids']
+        for user_id in user_ids.split(","):
+            user_info = UserInfo.objects.get(user_id=user_id)
+            user_info.delete()
+        return _generate_json_message(True, "remove user success")
+    except:
+        return _generate_json_message(False, "remove user false")
+
+
+# web删除用户信息
+# success
+def remove_user_web(request):
+    try:
+        user_ids = request.GET['user_ids']
+        #import pdb;pdb.set_trace()
         for user_id in user_ids.split(","):
             user_info = UserInfo.objects.get(user_id=user_id)
             user_info.delete()

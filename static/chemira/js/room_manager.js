@@ -62,13 +62,13 @@ $(document).ready(function() {
 
     function getApartNameSelections() {
         return $.map($table.bootstrapTable('getSelections'), function(row) {
-            return row.sname;
+            return row.username;
         });
     }
 
     function getIdSelections() {
         return $.map($table.bootstrapTable('getSelections'), function(row) {
-            return row.id;
+            return row.user_id;
         });
     }
 
@@ -82,21 +82,20 @@ $(document).ready(function() {
             console.log(row.id);
 
             $('#deleteSingleRoom').modal();
-            $('#deleteSingleRoomMsg').html(row.sname + ' ?');
-
+            $('#deleteSingleRoomMsg').html(row.username + ' ?');
             $('#deleteSingleRoomOk').click(function() {
                 $.ajax({
-                    url: "/delete_dev",
+                    url: "/remove_user_web/",
                     dataType: "json",
-                    data: { "sname": row.sname },
+                    data: { "user_ids": row.user_ids },
                     success: function(msg) {
                         var msg_val = eval(msg);
                         if (msg_val.message === '200denied') {
                             alert("不允许删除！");
                         } else if (msg_val.message === '200success') {
                             $table.bootstrapTable('remove', {
-                                field: 'apartment_id',
-                                values: [row.apartment_id]
+                                field: 'user_id',
+                                values: [row.user_id]
                             });
                             $('#deleteSingleRoom').modal('hide');
                         }
@@ -119,9 +118,9 @@ $(document).ready(function() {
             $('#deleteMultiRoomMsg').html(apart_name + ' ?'+ ids_str);
             $('#deleteMultiRoomOk').click(function() {
                 $.ajax({
-                    url: "/delete_dev",
+                    url: "/remove_user_web/",
                     dataType: "json",
-                    data: { dev_ids: ids_str },
+                    data: { user_ids: ids_str },
                     success: function(msg) {
                         location.reload();
                     }
