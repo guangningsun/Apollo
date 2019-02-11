@@ -3,7 +3,7 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 import json,time
-from TestModel.models import UserInfo,AddressInfo,NewsInfo,UserNewsMapping
+from TestModel.models import UserInfo,AddressInfo,NewsInfo,UserNewsMapping,GameInfo,MerchantInfo
 
 # 内部方法，用于获取当前时间戳
 def _get_timestamp():
@@ -90,7 +90,8 @@ def create_user(request):
                                  user_id=_get_timestamp(),
                                  user_email=request.POST['user_email'],
                                  user_address=request.POST['user_address'],
-                                 user_phone=request.POST['user_phone']
+                                 user_phone=request.POST['user_phone'],
+                                 user_permission=request.POST['user_permission']
                                  )
             user_info.save()
         return _generate_json_message(True, "create user success")
@@ -108,7 +109,8 @@ def create_user_web(request):
                                  user_id=_get_timestamp(),
                                  user_email=request.POST['user_email'],
                                  user_address=request.POST['user_address'],
-                                 user_phone=request.POST['user_phone']
+                                 user_phone=request.POST['user_phone'],
+                                 user_permission=request.POST['user_permission']
                                  )
             user_info.save()
         return render(request,"manager.html")
@@ -153,6 +155,7 @@ def modify_user(request):
             user_info.user_email= request.POST['user_email']
             user_info.user_address = request.POST['user_address']
             user_info.user_phone = request.POST['user_phone']
+            user_info.user_permission = request.POST['user_permission']
             user_info.save()
         return _generate_json_message(True,"update user info success")
     except:
@@ -378,6 +381,96 @@ def modify_news(request):
         return _generate_json_message(False, "update news info false")
 
 # 爬虫爬取人民日报最新20条文章
+
+
+# 获取游戏列表
+def get_game_list(request):
+    list_response = []
+    list_news = GameInfo.objects.all()
+    for res in list_news:
+        dict_tmp = {}
+        dict_tmp.update(res.__dict__)
+        dict_tmp.pop("_state", None)
+        list_response.append(dict_tmp)
+    return _generate_json_from_models(list_response)
+
+
+# 创建游戏
+def create_game(request):
+    try:
+        if request.POST:
+            game_info = GameInfo(game_id=_get_timestamp(),
+                                 game_name=request.POST['game_name'],
+                                 game_desc=request.POST['game_desc']
+                                 )
+            game_info.save()
+        return _generate_json_message(True, "create game success")
+    except:
+        return _generate_json_message(False, "create game false")
+
+
+# 用户申请商户注册
+def user_apply_merchant(request):
+    try:
+        if request.POST:
+            merchant_info = MerchantInfo(merchant_id=_get_timestamp(),
+                                     merchant_name=request.POST['merchant_name'],
+                                     merchant_desc=request.POST['merchant_desc'],
+                                     application_user=request.POST['application_user'],
+                                     application_type=request.POST['application_type'],
+                                     approval_user=request.POST['approval_user'],
+                                 )
+            merchant_info.save()
+        return _generate_json_message(True, "create merchant success")
+    except:
+        return _generate_json_message(False, "create merchant false")
+
+
+# 管理员获取待审批商户
+# 0 为待审核
+# 1 为审核通过
+# 2 为审核未通过
+def admin_get_merchant_need_approval(request):
+    try:
+        list_response = []
+        list_merchant_need_approval = MerchantInfo.objects.filter(application_type=0)
+        if list_merchant_need_approval:
+            for res in list_merchant_need_approval:
+                dict_tmp = {}
+                dict_tmp.update(res.__dict__)
+                dict_tmp.pop("_state", None)
+                list_response.append(dict_tmp)
+        return _generate_json_from_models(list_response)
+    except:
+        return _generate_json_message(False, "can`t get merchant info ")
+
+
+# 管理员审批商户
+def admin_approval_merchant(request):
+    try:
+        if request.POST:
+            merchant_info = MerchantInfo.objects.get(merchant_id=request.POST['merchant_id'])
+            merchant_info.application_type = request.POST['application_type']
+            merchant_info.save()
+        return _generate_json_message(True,"update merchant_info info success")
+    except:
+        return _generate_json_message(False, "update merchant_info info false")
+
+# 用户修改商铺信息
+def modify_merchant_info(request):
+    try:
+        if request.POST:
+            merchant_info = MerchantInfo.objects.get(merchant_id=request.POST['merchant_id'])
+            merchant_info.merchant_name = request.POST['merchant_name']
+            merchant_info.merchant_desc = request.POST['merchant_desc']
+            merchant_info.application_user = request.POST['application_user']
+            merchant_info.application_type = request.POST['application_type']
+            merchant_info.approval_user = request.POST['approval_user']
+            merchant_info.save()
+        return _generate_json_message(True,"update merchant_info info success")
+    except:
+        return _generate_json_message(False, "update merchant_info info false")
+
 
 # 初始化登录界面
 def init_web(request):

@@ -45,4 +45,6 @@ urlpatterns = [
     url(r'^remove_collected_news/',views.remove_collected_news),
     url(r'^get_all_collection_list/',views.get_all_collection_list),
     url(r'^get_collection_list_by_user_id/',views.get_collection_list_by_user_id),
+    url(r'^get_game_list/',views.get_game_list),
+    url(r'^create_game/',views.create_game),
 ]
